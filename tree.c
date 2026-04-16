@@ -166,3 +166,47 @@ static int write_subtree(IndexEntry *entries, int count, int prefix_len, ObjectI
                     break;
                 }
             }
+            
+            ObjectID sub_id;
+            if (write_subtree(entries + i, j - i, slash - cur->path + 1, &sub_id) < 0) return -1;
+            
+            TreeEntry *te = &tree.entries[tree.count++];
+            strncpy(te->name, name_start, dir_name_len);
+            te->name[dir_name_len] = '\0';
+            te->mode = MODE_DIR;
+            te->hash = sub_id;
+            
+            i = j;
+        }
+    }
+    
+    void *data;
+    size_t len;
+    if (tree_serialize(&tree, &data, &len) < 0) return -1;
+    
+    if (object_write(OBJ_TREE, data, len, id_out) < 0) {
+        free(data);
+        return -1;
+    }
+    free(data);
+    
+    return 0;
+}
+
+int tree_from_index(ObjectID *id_out) {
+    Index index;
+    if (index_load(&index) < 0) return -1;
+    
+    if (index.count == 0) {
+        Tree tree;
+        tree.count = 0;
+        void *data;
+        size_t len;
+        if (tree_serialize(&tree, &data, &len) < 0) return -1;
+        int ret = object_write(OBJ_TREE, data, len, id_out);
+        free(data);
+        return ret;
+    }
+    
+    return write_subtree(index.entries, index.count, 0, id_out);
+}
