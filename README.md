@@ -1,3 +1,7 @@
+# Info
+Name: Samarth Mohan
+SRN: PES1UG24CS703
+
 # Building PES-VCS — A Version Control System from Scratch
 
 **Objective:** Build a local version control system that tracks file changes, stores snapshots efficiently, and supports commit history. Every component maps directly to operating system and filesystem concepts.
@@ -559,6 +563,18 @@ The following questions cover filesystem concepts beyond the implementation scop
 | 4     | 4B  | `find .pes -type f \| sort` showing object growth              |
 | 4     | 4C  | `cat .pes/refs/heads/main` and `cat .pes/HEAD`                 |
 | Final | --  | Full integration test (`make test-integration`)                 |
+
+### Attached Screenshots
+- **1A**: ![Screenshot 1A](docs/screenshots/1A.png)
+- **1B**: ![Screenshot 1B](docs/screenshots/1B.png)
+- **2A**: ![Screenshot 2A](docs/screenshots/2A.png)
+- **2B**: ![Screenshot 2B](docs/screenshots/2B.png)
+- **3A**: ![Screenshot 3A](docs/screenshots/3A.png)
+- **3B**: ![Screenshot 3B](docs/screenshots/3B.png)
+- **4A**: ![Screenshot 4A](docs/screenshots/4A.png)
+- **4B**: ![Screenshot 4B](docs/screenshots/4B.png)
+- **4C**: ![Screenshot 4C](docs/screenshots/4C.png)
+- **Final Output**: ![Screenshot 5](docs/screenshots/5.png)
 
 ### Code Files Required (5 files)
 
