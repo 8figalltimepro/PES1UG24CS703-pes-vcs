@@ -13,6 +13,17 @@
   </a>
 </p>
 
+---
+
+## Q/A
+
+<p align="left">
+  <a href="https://github.com/8figalltimepro/PES1UG24CS703-pes-vcs#analysis-questions-answers">
+    <img src="https://img.shields.io/badge/View-Answers-blue?style=for-the-badge" alt="View Screenshots">
+  </a>
+</p>
+
+
 # Building PES-VCS — A Version Control System from Scratch
 
 **Objective:** Build a local version control system that tracks file changes, stores snapshots efficiently, and supports commit history. Every component maps directly to operating system and filesystem concepts.
