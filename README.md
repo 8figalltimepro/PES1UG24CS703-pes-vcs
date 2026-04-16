@@ -24,7 +24,7 @@
 </p>
 
 
-# Building PES-VCS — A Version Control System from Scratch
+# Building PES-VCS - A Version Control System from Scratch
 
 **Objective:** Build a local version control system that tracks file changes, stores snapshots efficiently, and supports commit history. Every component maps directly to operating system and filesystem concepts.
 
@@ -50,7 +50,7 @@ This is a **template repository**. Do **not** fork it.
 4.  **Important:** Remember to commit frequently as you progress. You are required to have a minimum of 5 detailed commits per phase. Refer to [Submission Requirements](#submission-requirements) for more details.
 5. Clone your new repository and start working
 
-The repository contains skeleton source files with `// TODO` markers where you need to write code. Functions marked `// PROVIDED` are complete — do not modify them.
+The repository contains skeleton source files with `// TODO` markers where you need to write code. Functions marked `// PROVIDED` are complete - do not modify them.
 
 ### Building
 
@@ -124,7 +124,7 @@ Your project at commit A:          Your project at commit B:
 
 #### 1. Blob (Binary Large Object)
 
-A blob is just file contents. No filename, no permissions — just the raw bytes.
+A blob is just file contents. No filename, no permissions - just the raw bytes.
 
 ```
 blob 16\0Hello, World!\n
@@ -150,9 +150,9 @@ A tree represents a directory. It's a list of entries, each pointing to a blob (
 ```
 
 Mode values:
-- `100644` — regular file, not executable
-- `100755` — regular file, executable
-- `040000` — directory (tree)
+- `100644` - regular file, not executable
+- `100755` - regular file, executable
+- `040000` - directory (tree)
 
 #### 3. Commit
 
@@ -375,13 +375,13 @@ my_project/
 
 Open `object.c`. Two functions are marked `// TODO`:
 
-1. **`object_write`** — Stores data in the object store.
+1. **`object_write`** - Stores data in the object store.
    - Prepends a type header (`"blob <size>\0"`, `"tree <size>\0"`, or `"commit <size>\0"`)
    - Computes SHA-256 of the full object (header + data)
    - Writes atomically using the temp-file-then-rename pattern
    - Shards into subdirectories by first 2 hex chars of hash
 
-2. **`object_read`** — Retrieves and verifies data from the object store.
+2. **`object_read`** - Retrieves and verifies data from the object store.
    - Reads the file, parses the header to extract type and size
    - **Verifies integrity** by recomputing the hash and comparing to the filename
    - Returns the data portion (after the `\0`)
@@ -416,7 +416,7 @@ The test program verifies:
 
 Open `tree.c`. Implement the function marked `// TODO`:
 
-1. **`tree_from_index`** — Builds a tree hierarchy from the index.
+1. **`tree_from_index`** - Builds a tree hierarchy from the index.
    - Handles nested paths: `"src/main.c"` must create a `src` subtree
    - This is what `pes commit` uses to create the snapshot
    - Writes all tree objects to the object store and returns the root hash
@@ -448,18 +448,18 @@ The test program verifies:
 
 Open `index.c`. Three functions are marked `// TODO`:
 
-1. **`index_load`** — Reads the text-based `.pes/index` file into an `Index` struct.
+1. **`index_load`** - Reads the text-based `.pes/index` file into an `Index` struct.
    - If the file doesn't exist, initializes an empty index (this is not an error)
    - Parses each line: `<mode> <hash-hex> <mtime> <size> <path>`
 
-2. **`index_save`** — Writes the index atomically (temp file + rename).
+2. **`index_save`** - Writes the index atomically (temp file + rename).
    - Sorts entries by path before writing
    - Uses `fsync()` on the temp file before renaming
 
-3. **`index_add`** — Stages a file: reads it, writes blob to object store, updates index entry.
+3. **`index_add`** - Stages a file: reads it, writes blob to object store, updates index entry.
    - Use the provided `index_find` to check for an existing entry
 
-`index_find` , `index_status` and `index_remove` are already implemented for you — read them to understand the index data structure before starting.
+`index_find` , `index_status` and `index_remove` are already implemented for you - read them to understand the index data structure before starting.
 
 #### Expected Output of `pes status`
 
@@ -490,7 +490,7 @@ echo "world" > file2.txt
 cat .pes/index    # Human-readable text format
 ```
 
-**📸 Screenshot 3A:** Run `./pes init`, `./pes add file1.txt file2.txt`, `./pes status` — show the output.
+**📸 Screenshot 3A:** Run `./pes init`, `./pes add file1.txt file2.txt`, `./pes status` - show the output.
 
 **📸 Screenshot 3B:** `cat .pes/index` showing the text-format index with your entries.
 
@@ -506,13 +506,13 @@ cat .pes/index    # Human-readable text format
 
 Open `commit.c`. One function is marked `// TODO`:
 
-1. **`commit_create`** — The main commit function:
-   - Builds a tree from the index using `tree_from_index()` (**not** from the working directory — commits snapshot the staged state)
+1. **`commit_create`** - The main commit function:
+   - Builds a tree from the index using `tree_from_index()` (**not** from the working directory - commits snapshot the staged state)
    - Reads current HEAD as the parent (may not exist for first commit)
    - Gets the author string from `pes_author()` (defined in `pes.h`)
    - Writes the commit object, then updates HEAD
 
-`commit_parse`, `commit_serialize`, `commit_walk`, `head_read`, and `head_update` are already implemented — read them to understand the commit format before writing `commit_create`.
+`commit_parse`, `commit_serialize`, `commit_walk`, `head_read`, and `head_update` are already implemented - read them to understand the commit format before writing `commit_create`.
 
 The commit text format is specified in the comment at the top of `commit.c`.
 
@@ -551,11 +551,11 @@ make test-integration
 
 ## Phase 5 & 6: Analysis-Only Questions
 
-The following questions cover filesystem concepts beyond the implementation scope of this lab. Answer them in writing — no code required.
+The following questions cover filesystem concepts beyond the implementation scope of this lab. Answer them in writing - no code required.
 
 ### Branching and Checkout
 
-**Q5.1:** A branch in Git is just a file in `.git/refs/heads/` containing a commit hash. Creating a branch is creating a file. Given this, how would you implement `pes checkout <branch>` — what files need to change in `.pes/`, and what must happen to the working directory? What makes this operation complex?
+**Q5.1:** A branch in Git is just a file in `.git/refs/heads/` containing a commit hash. Creating a branch is creating a file. Given this, how would you implement `pes checkout <branch>` - what files need to change in `.pes/`, and what must happen to the working directory? What makes this operation complex?
 
 **Q5.2:** When switching branches, the working directory must be updated to match the target branch's tree. If the user has uncommitted changes to a tracked file, and that file differs between branches, checkout must refuse. Describe how you would detect this "dirty working directory" conflict using only the index and the object store.
 
@@ -563,7 +563,7 @@ The following questions cover filesystem concepts beyond the implementation scop
 
 ### Garbage Collection and Space Reclamation
 
-**Q6.1:** Over time, the object store accumulates unreachable objects — blobs, trees, or commits that no branch points to (directly or transitively). Describe an algorithm to find and delete these objects. What data structure would you use to track "reachable" hashes efficiently? For a repository with 100,000 commits and 50 branches, estimate how many objects you'd need to visit.
+**Q6.1:** Over time, the object store accumulates unreachable objects - blobs, trees, or commits that no branch points to (directly or transitively). Describe an algorithm to find and delete these objects. What data structure would you use to track "reachable" hashes efficiently? For a repository with 100,000 commits and 50 branches, estimate how many objects you'd need to visit.
 
 **Q6.2:** Why is it dangerous to run garbage collection concurrently with a commit operation? Describe a race condition where GC could delete an object that a concurrent commit is about to reference. How does Git's real GC avoid this?
 
@@ -645,19 +645,24 @@ The following questions cover filesystem concepts beyond the implementation scop
 
 ### Branching and Checkout
 
-**Q5.1:** A branch in Git is just a file in `.git/refs/heads/` containing a commit hash. Creating a branch is creating a file. Given this, how would you implement `pes checkout <branch>` — what files need to change in `.pes/`, and what must happen to the working directory? What makes this operation complex?
-**Answer 5.1:** To implement `pes checkout <branch>`, I would update `.pes/HEAD` to contain `ref: refs/heads/<branch>`. In the working directory, the files must be completely updated to match the tree snapshot of the commit pointed to by `<branch>`. This means reading the commit object from the branch reference, parsing its tree, and then recursively exploring the tree to replace, create, or delete the working directory files and directories to mirror the branch's snapshot. The complexity comes from preserving the user's uncommitted tracked and untracked changes, handling file permissions consistently, ensuring safe directory traversal, and resolving conflicts gracefully when a file in the working directory differs from both the current branch and the target branch.
+**Q5.1:** A branch in Git is just a file in `.git/refs/heads/` containing a commit hash. Creating a branch is creating a file. Given this, how would you implement `pes checkout <branch>` - what files need to change in `.pes/`, and what must happen to the working directory? What makes this operation complex?
+
+  **Answer 5.1:** To implement `pes checkout <branch>`, I would update `.pes/HEAD` to contain `ref: refs/heads/<branch>`. In the working directory, the files must be completely updated to match the tree snapshot of the commit pointed to by `<branch>`. This means reading the commit object from the branch reference, parsing its tree, and then recursively exploring the tree to replace, create, or delete the working directory files and directories to mirror the branch's snapshot. The complexity comes from preserving the user's uncommitted tracked and untracked changes, handling file permissions consistently, ensuring safe directory traversal, and resolving conflicts gracefully when a file in the working directory differs from both the current branch and the target branch.
 
 **Q5.2:** When switching branches, the working directory must be updated to match the target branch's tree. If the user has uncommitted changes to a tracked file, and that file differs between branches, checkout must refuse. Describe how you would detect this "dirty working directory" conflict using only the index and the object store.
-**Answer 5.2:** To detect a "dirty working directory", we can compare the file's hash in the target branch's tree object (from the object store) with its hash in the current index, and with its current state in the working directory. If a file is modified (i.e. its hash or metadata differs between the working directory and the index) and the file's hash in the target branch's tree differs from the current branch's tree, a conflict exists. By utilizing the staging index, we can detect if there are uncommitted modifications to the tracked file dynamically without having to re-hash the entire working tree; any non-empty diff output when computing differences highlights the dirty state.
+
+  **Answer 5.2:** To detect a "dirty working directory", we can compare the file's hash in the target branch's tree object (from the object store) with its hash in the current index, and with its current state in the working directory. If a file is modified (i.e. its hash or metadata differs between the working directory and the index) and the file's hash in the target branch's tree differs from the current branch's tree, a conflict exists. By utilizing the staging index, we can detect if there are uncommitted modifications to the tracked file dynamically without having to re-hash the entire working tree; any non-empty diff output when computing differences highlights the dirty state.
 
 **Q5.3:** "Detached HEAD" means HEAD contains a commit hash directly instead of a branch reference. What happens if you make commits in this state? How could a user recover those commits?
-**Answer 5.3:** If commits are made in a "Detached HEAD" state, the new commit objects are created correctly and HEAD is updated to point to the new commit's hash, but no branch reference is updated to point to them. If the user later checks out a different branch, these commits become unreachable directly via any branch reference and effectively "orphaned", risking deletion by Garbage Collection. To recover those commits, the user can create a new branch pointing to that commit's hash before switching away (e.g., `pes branch recovery_branch ` or `pes checkout -b recovery_branch`), or use a tool like Git's `reflog` (or search the object store / logs manually) to find the orphaned hash and force a branch reference to point to it.
+
+  **Answer 5.3:** If commits are made in a "Detached HEAD" state, the new commit objects are created correctly and HEAD is updated to point to the new commit's hash, but no branch reference is updated to point to them. If the user later checks out a different branch, these commits become unreachable directly via any branch reference and effectively "orphaned", risking deletion by Garbage Collection. To recover those commits, the user can create a new branch pointing to that commit's hash before switching away (e.g., `pes branch recovery_branch ` or `pes checkout -b recovery_branch`), or use a tool like Git's `reflog` (or search the object store / logs manually) to find the orphaned hash and force a branch reference to point to it.
 
 ### Garbage Collection and Space Reclamation
 
-**Q6.1:** Over time, the object store accumulates unreachable objects — blobs, trees, or commits that no branch points to (directly or transitively). Describe an algorithm to find and delete these objects. What data structure would you use to track "reachable" hashes efficiently? For a repository with 100,000 commits and 50 branches, estimate how many objects you'd need to visit.
-**Answer 6.1:** To garbage collect unreachable objects, the algorithm must perform an exhaustive graph traversal (e.g., Breadth-First or Depth-First Search) starting from all known reference pointers (all branch files in `.pes/refs/heads/`, `.pes/HEAD`, `.pes/index`, etc.). As it explores commits, it marks them, then traverses to parent commits and linked trees, continuously following child trees and blobs, marking every encountered hash as reachable. We would track these hashes in an in-memory hash set or bloom filter for O(1) lookups. After traversing all reachable objects, the GC scans the `.pes/objects/` directory; any file not present in the "reachable" set is deleted. For a repository of 100,000 commits and 50 branches, many commits share identical trees and parents, so the set will union heavily. Assuming 3 files changed per commit on average and historical lineage is largely linear, you'd visit roughly a few hundred thousand objects minimum (the 100,000 commits + trees + deduplicated blobs).
+**Q6.1:** Over time, the object store accumulates unreachable objects - blobs, trees, or commits that no branch points to (directly or transitively). Describe an algorithm to find and delete these objects. What data structure would you use to track "reachable" hashes efficiently? For a repository with 100,000 commits and 50 branches, estimate how many objects you'd need to visit.
+
+  **Answer 6.1:** To garbage collect unreachable objects, the algorithm must perform an exhaustive graph traversal (e.g., Breadth-First or Depth-First Search) starting from all known reference pointers (all branch files in `.pes/refs/heads/`, `.pes/HEAD`, `.pes/index`, etc.). As it explores commits, it marks them, then traverses to parent commits and linked trees, continuously following child trees and blobs, marking every encountered hash as reachable. We would track these hashes in an in-memory hash set or bloom filter for O(1) lookups. After traversing all reachable objects, the GC scans the `.pes/objects/` directory; any file not present in the "reachable" set is deleted. For a repository of 100,000 commits and 50 branches, many commits share identical trees and parents, so the set will union heavily. Assuming 3 files changed per commit on average and historical lineage is largely linear, you'd visit roughly a few hundred thousand objects minimum (the 100,000 commits + trees + deduplicated blobs).
 
 **Q6.2:** Why is it dangerous to run garbage collection concurrently with a commit operation? Describe a race condition where GC could delete an object that a concurrent commit is about to reference. How does Git's real GC avoid this?
-**Answer 6.2:** A concurrent garbage collection is dangerous because a new commit operation stages files (creating blobs and trees in the object store) before creating the commit and linking it to a commit root or branch reference. If GC runs during this window — after a new blob or tree is written but before the branch reference or root commit points to it — GC sees these new objects as unreachable and deletes them. When the commit mechanism attempts to finalize, it references missing objects, corrupting the repository. Git avoids this race condition using object grace periods (or modifying retention periods based on the object's timestamps). GC only deletes loose objects that are older than a specific threshold (e.g., 2 weeks), guaranteeing that any object being actively written by a concurrent operation will be too fresh to be considered garbage.
+
+  **Answer 6.2:** A concurrent garbage collection is dangerous because a new commit operation stages files (creating blobs and trees in the object store) before creating the commit and linking it to a commit root or branch reference. If GC runs during this window - after a new blob or tree is written but before the branch reference or root commit points to it - GC sees these new objects as unreachable and deletes them. When the commit mechanism attempts to finalize, it references missing objects, corrupting the repository. Git avoids this race condition using object grace periods (or modifying retention periods based on the object's timestamps). GC only deletes loose objects that are older than a specific threshold (e.g., 2 weeks), guaranteeing that any object being actively written by a concurrent operation will be too fresh to be considered garbage.
