@@ -124,3 +124,45 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
 
 // ─── TODO: Implement these ──────────────────────────────────────────────────
 
+// Build a tree hierarchy from the current index and write all tree
+// objects to the object store.
+//
+// HINTS - Useful functions and concepts for this phase:
+//   - index_load      : load the staged files into memory
+//   - strchr          : find the first '/' in a path to separate directories from files
+//   - strncmp         : compare prefixes to group files belonging to the same subdirectory
+//   - Recursion       : you will likely want to create a recursive helper function 
+//                       (e.g., `write_tree_level(entries, count, depth)`) to handle nested dirs.
+//   - tree_serialize  : convert your populated Tree struct into a binary buffer
+//   - object_write    : save that binary buffer to the store as OBJ_TREE
+//
+// Returns 0 on success, -1 on error.
+static int write_subtree(IndexEntry *entries, int count, int prefix_len, ObjectID *id_out) {
+    Tree tree;
+    tree.count = 0;
+    
+    int i = 0;
+    while (i < count) {
+        if (tree.count >= MAX_TREE_ENTRIES) return -1;
+        
+        IndexEntry *cur = &entries[i];
+        const char *name_start = cur->path + prefix_len;
+        const char *slash = strchr(name_start, '/');
+        
+        if (!slash) {
+            TreeEntry *te = &tree.entries[tree.count++];
+            strcpy(te->name, name_start);
+            te->mode = cur->mode;
+            te->hash = cur->hash;
+            i++;
+        } else {
+            int dir_name_len = slash - name_start;
+            int j = i + 1;
+            while (j < count) {
+                const char *j_name_start = entries[j].path + prefix_len;
+                if (strncmp(j_name_start, name_start, dir_name_len) == 0 && j_name_start[dir_name_len] == '/') {
+                    j++;
+                } else {
+                    break;
+                }
+            }
