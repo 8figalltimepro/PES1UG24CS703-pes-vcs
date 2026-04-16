@@ -1,6 +1,17 @@
 # Info
-Name: Samarth Mohan
-SRN: PES1UG24CS703
+
+**Name:** Samarth Mohan  
+**SRN:** PES1UG24CS703  
+
+---
+
+## Screenshots
+
+<p align="left">
+  <a href="https://github.com/8figalltimepro/PES1UG24CS703-pes-vcs#attached-screenshots">
+    <img src="https://img.shields.io/badge/View-Screenshots-blue?style=for-the-badge" alt="View Screenshots">
+  </a>
+</p>
 
 # Building PES-VCS — A Version Control System from Scratch
 
