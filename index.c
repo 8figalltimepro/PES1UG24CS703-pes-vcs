@@ -218,3 +218,60 @@ int index_save(const Index *index) {
     
     free(sorted);
     return 0;
+}
+
+// Stage a file for the next commit.
+//
+// HINTS - Useful functions and syscalls:
+//   - fopen, fread, fclose             : reading the target file's contents
+//   - object_write                     : saving the contents as OBJ_BLOB
+//   - stat / lstat                     : getting file metadata (size, mtime, mode)
+//   - index_find                       : checking if the file is already staged
+//
+// Returns 0 on success, -1 on error.
+int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out);
+
+int index_add(Index *index, const char *path) {
+    struct stat st;
+    if (lstat(path, &st) != 0) return -1;
+    
+    if (S_ISDIR(st.st_mode)) {
+        fprintf(stderr, "error: %s is a directory\n", path);
+        return -1;
+    }
+    
+    FILE *f = fopen(path, "rb");
+    if (!f) return -1;
+
+    size_t size = st.st_size;
+    void *data = malloc(size + 1);
+    if (!data && size > 0) { fclose(f); return -1; }
+    
+    if (size > 0 && fread(data, 1, size, f) != size) {
+        free(data); fclose(f); return -1;
+    }
+    fclose(f);
+
+    ObjectID blob_id;
+    if (object_write(OBJ_BLOB, data, size, &blob_id) < 0) {
+        free(data);
+        return -1;
+    }
+    free(data);
+
+    IndexEntry *entry = index_find(index, path);
+    if (!entry) {
+        if (index->count >= MAX_INDEX_ENTRIES) return -1;
+        entry = &index->entries[index->count++];
+        strcpy(entry->path, path);
+    }
+
+    if (st.st_mode & S_IXUSR) entry->mode = 0100755;
+    else entry->mode = 0100644;
+    
+    entry->hash = blob_id;
+    entry->mtime_sec = st.st_mtime;
+    entry->size = size;
+
+    return index_save(index);
+}
