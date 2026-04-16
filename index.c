@@ -108,3 +108,58 @@ int index_status(const Index *index) {
                 }
             }
             
+            if (!is_tracked) {
+                struct stat st;
+                stat(ent->d_name, &st);
+                if (S_ISREG(st.st_mode)) { // Only list regular files for simplicity
+                    printf("  untracked:  %s\n", ent->d_name);
+                    untracked_count++;
+                }
+            }
+        }
+        closedir(dir);
+    }
+    if (untracked_count == 0) printf("  (nothing to show)\n");
+    printf("\n");
+
+    return 0;
+}
+
+// ─── TODO: Implement these ───────────────────────────────────────────────────
+
+// Load the index from .pes/index.
+//
+// HINTS - Useful functions:
+//   - fopen (with "r"), fscanf, fclose : reading the text file line by line
+//   - hex_to_hash                      : converting the parsed string to ObjectID
+//
+// Returns 0 on success, -1 on error.
+int index_load(Index *index) {
+    index->count = 0;
+    FILE *f = fopen(INDEX_FILE, "r");
+    if (!f) return 0; 
+    
+    char line[1024];
+    while (fgets(line, sizeof(line), f)) {
+        if (index->count >= MAX_INDEX_ENTRIES) break;
+        IndexEntry *entry = &index->entries[index->count];
+        char hash_hex[65];
+        unsigned int mode_tmp;
+        unsigned long mtime_tmp;
+        unsigned int size_tmp;
+        if (sscanf(line, "%o %64s %lu %u %[^\n]", 
+                   &mode_tmp, hash_hex, &mtime_tmp, &size_tmp, entry->path) == 5) {
+            entry->mode = mode_tmp;
+            entry->mtime_sec = mtime_tmp;
+            entry->size = size_tmp;
+            hex_to_hash(hash_hex, &entry->hash);
+            index->count++;
+        }
+    }
+    fclose(f);
+    return 0;
+}
+
+// Save the index to .pes/index atomically.
+//
+// HINTS - Useful functions and syscalls:
