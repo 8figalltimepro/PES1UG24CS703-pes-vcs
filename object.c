@@ -198,3 +198,55 @@ int object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_
     long file_size = ftell(f);
     fseek(f, 0, SEEK_SET);
 
+    char *full_data = malloc(file_size);
+    if (!full_data) {
+        fclose(f);
+        return -1;
+    }
+
+    if (fread(full_data, 1, file_size, f) != (size_t)file_size) {
+        free(full_data);
+        fclose(f);
+        return -1;
+    }
+    fclose(f);
+
+    ObjectID computed_id;
+    compute_hash(full_data, file_size, &computed_id);
+    if (memcmp(id->hash, computed_id.hash, HASH_SIZE) != 0) {
+        free(full_data);
+        return -1;
+    }
+
+    char *null_byte = memchr(full_data, '\0', file_size);
+    if (!null_byte) {
+        free(full_data);
+        return -1;
+    }
+
+    if (strncmp(full_data, "blob", 4) == 0) {
+        *type_out = OBJ_BLOB;
+    } else if (strncmp(full_data, "tree", 4) == 0) {
+        *type_out = OBJ_TREE;
+    } else if (strncmp(full_data, "commit", 6) == 0) {
+        *type_out = OBJ_COMMIT;
+    } else {
+        free(full_data);
+        return -1;
+    }
+
+    *len_out = file_size - (null_byte + 1 - full_data);
+    *data_out = malloc(*len_out + 1); // alloc a bit extra to be safe for strings
+    if (!*data_out) {
+        free(full_data);
+        return -1;
+    }
+
+    if (*len_out > 0) {
+        memcpy(*data_out, null_byte + 1, *len_out);
+    }
+    ((char*)*data_out)[*len_out] = '\0'; // ensure null termination if used as string
+    
+    free(full_data);
+    return 0;
+}
