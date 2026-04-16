@@ -163,3 +163,58 @@ int index_load(Index *index) {
 // Save the index to .pes/index atomically.
 //
 // HINTS - Useful functions and syscalls:
+//   - qsort                            : sorting the entries array by path
+//   - fopen (with "w"), fprintf        : writing to the temporary file
+//   - hash_to_hex                      : converting ObjectID for text output
+//   - fflush, fileno, fsync, fclose    : flushing userspace buffers and syncing to disk
+//   - rename                           : atomically moving the temp file over the old index
+//
+// Returns 0 on success, -1 on error.
+static int compare_index_entries(const void *a, const void *b) {
+    return strcmp(((const IndexEntry *)a)->path, ((const IndexEntry *)b)->path);
+}
+
+int index_save(const Index *index) {
+    Index *sorted = malloc(sizeof(Index));
+    if (!sorted) return -1;
+    *sorted = *index;
+    qsort(sorted->entries, sorted->count, sizeof(IndexEntry), compare_index_entries);
+
+    char temp_path[] = ".pes/index_XXXXXX";
+    int fd = mkstemp(temp_path);
+    if (fd < 0) {
+        free(sorted);
+        return -1;
+    }
+
+    FILE *f = fdopen(fd, "w");
+    if (!f) {
+        close(fd);
+        unlink(temp_path);
+        free(sorted);
+        return -1;
+    }
+
+    for (int i = 0; i < sorted->count; i++) {
+        char hash_hex[HASH_HEX_SIZE + 1];
+        hash_to_hex(&sorted->entries[i].hash, hash_hex);
+        fprintf(f, "%06o %s %lu %u %s\n",
+                sorted->entries[i].mode,
+                hash_hex,
+                (unsigned long)sorted->entries[i].mtime_sec,
+                sorted->entries[i].size,
+                sorted->entries[i].path);
+    }
+
+    fflush(f);
+    fsync(fileno(f));
+    fclose(f);
+
+    if (rename(temp_path, INDEX_FILE) < 0) {
+        unlink(temp_path);
+        free(sorted);
+        return -1;
+    }
+    
+    free(sorted);
+    return 0;
